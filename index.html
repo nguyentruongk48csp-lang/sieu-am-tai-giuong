@@ -106,18 +106,24 @@ button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 #print .sign{display:flex;justify-content:flex-end;margin-top:14px;text-align:center;font-size:13px}
 /* Khi tạo PDF: dựng phiếu ngoài màn hình với khổ A4 trừ lề */
 body.rendering #print{display:block;width:186mm;padding:0}
-/* Hộp PDF đã sẵn sàng */
-.pdfbox{position:fixed;inset:0;z-index:30;background:rgba(10,12,16,.55);display:flex;align-items:flex-end;justify-content:center;
-  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.pdfbox .in{background:var(--paper);color:var(--ink);border-radius:16px;padding:18px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:10px}
-.pdfbox b{font-size:17px}
-.pdfbox p{margin:0;font-size:14px;color:var(--muted)}
-.pdfbox a.btn{display:block;text-align:center;text-decoration:none;font-weight:600;border-radius:12px;padding:12px;background:var(--accent);color:#fff}
+/* Màn hình xem bản PDF */
+.pv{position:fixed;inset:0;z-index:40;background:var(--soft);display:flex;flex-direction:column}
+.pv-head{display:flex;align-items:center;gap:12px;background:var(--paper);border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 10px max(14px,env(safe-area-inset-left,0px))}
+.pv-head b{flex:1;font-size:19px}
+.pv-head .save{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pv-head button:disabled{opacity:.6}
+.pv-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:16px max(12px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.pv-fit{margin:0 auto;overflow:hidden}
+.paper{width:210mm;min-height:297mm;padding:12mm;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.18);transform-origin:top left}
+.pv #print{display:block;width:186mm}
 @media print{
   @page{size:A4;margin:12mm}
   :root{color-scheme:light}
   body{background:#fff;color:#000;padding:0;font-size:12.5px}
-  .wrap,.bar,.toast,.pdfbox{display:none!important}
+  .wrap,.bar,.toast,.pv-head{display:none!important}
+  .pv{position:static;background:#fff}.pv-body{padding:0;overflow:visible}.pv-fit{width:auto!important;height:auto!important}
+  .paper{transform:none!important;box-shadow:none;padding:0;width:auto;min-height:0}
   #print{display:block;position:static;width:auto}
 }
 </style>
@@ -254,14 +260,14 @@ body.rendering #print{display:block;width:186mm;padding:0}
 </div>
 
 
-<div id="print"></div>
-<div class="pdfbox" id="pdfBox" hidden><div class="in">
-  <b>Phiếu PDF đã sẵn sàng</b>
-  <p id="pdfMsg"></p>
-  <button type="button" class="primary" id="pdfShare">In / Chia sẻ PDF</button>
-  <a class="btn" id="pdfOpen" href="#" target="_blank" rel="noopener">Mở PDF</a>
-  <button type="button" id="pdfClose">Đóng</button>
-</div></div>
+<div class="pv" id="pv" hidden>
+  <div class="pv-head">
+    <button type="button" id="pvClose">Đóng</button>
+    <b>Bản PDF</b>
+    <button type="button" class="save" id="pvSave" disabled>Lưu PDF</button>
+  </div>
+  <div class="pv-body"><div class="pv-fit" id="pvFit"><div class="paper" id="paper"><div id="print"></div></div></div></div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <div class="toast" id="toast" role="status"></div>
 
@@ -414,34 +420,43 @@ function buildPrint(){
   <div class="kl"><b>KẾT LUẬN:</b><br>${v('conc').replace(/\n/g,'<br>')}</div>
   <div class="sign"><div>Ngày ${date}<br><b>Bác sĩ siêu âm</b><br><br><br><br>${v('doctor')}</div></div>`;
 }
-/* In: trên điện thoại tạo PDF rồi mở bảng chia sẻ (có In, Lưu vào Tệp, Zalo…); trên máy tính dùng hộp in của trình duyệt */
-const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
-function pdfName(){const n=($('pName').value||'phieu').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^\w]+/g,'_').replace(/^_|_$/g,'');return `SA_tai_giuong_${n||'phieu'}.pdf`}
+/* In: hiện bản PDF trong app, "Lưu PDF" mở bảng chia sẻ (In, Lưu vào Tệp, Zalo…); tên file = tên bệnh nhân */
+function pdfName(){
+  const n=($('pName').value||'').normalize('NFC').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim();
+  return (n||'Phieu sieu am tai giuong')+'.pdf';
+}
 async function makePdf(){
-  buildPrint();document.body.classList.add('rendering');
+  document.body.classList.add('rendering');
   try{
     return await html2pdf().set({margin:12,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from($('print')).outputPdf('blob');
   }finally{document.body.classList.remove('rendering')}
 }
-let pdfUrl=null;
-function closeBox(){$('pdfBox').hidden=true}
-$('pdfClose').onclick=closeBox;
+function fitPaper(){
+  const p=$('paper'),f=$('pvFit');p.style.transform='';
+  const w=p.offsetWidth,h=p.offsetHeight,avail=$('pvFit').parentElement.clientWidth-parseFloat(getComputedStyle(f.parentElement).paddingLeft)-parseFloat(getComputedStyle(f.parentElement).paddingRight);
+  const k=Math.min(1,avail/w);p.style.transform=`scale(${k})`;f.style.width=w*k+'px';f.style.height=h*k+'px';
+}
+let pdfFile=null,pdfJob=0;
+function closePv(){$('pv').hidden=true;document.documentElement.style.overflow=''}
+$('pvClose').onclick=closePv;
+window.addEventListener('resize',()=>{if(!$('pv').hidden)fitPaper()});
 $('btnPrint').onclick=async()=>{
-  if(!isMobile||typeof html2pdf==='undefined'){buildPrint();try{window.print()}catch(e){}return}
-  const b=$('btnPrint');b.disabled=true;b.textContent='Đang tạo PDF…';
+  buildPrint();$('pv').hidden=false;document.documentElement.style.overflow='hidden';fitPaper();
+  const save=$('pvSave');save.disabled=true;save.textContent='Đang tạo…';pdfFile=null;
+  if(typeof html2pdf==='undefined'){save.disabled=false;save.textContent='In';save.onclick=()=>{try{window.print()}catch(e){}};return}
+  const job=++pdfJob;
   try{
-    const blob=await makePdf();const name=pdfName();
-    const file=new File([blob],name,{type:'application/pdf'});
-    if(pdfUrl)URL.revokeObjectURL(pdfUrl);pdfUrl=URL.createObjectURL(blob);
-    const share=$('pdfShare'),open=$('pdfOpen');
-    open.href=pdfUrl;open.download=name;
-    const canShare=!!(navigator.canShare&&navigator.canShare({files:[file]}));
-    share.hidden=!canShare;
-    $('pdfMsg').textContent=canShare?'Bấm “In / Chia sẻ PDF”, rồi chọn In (hoặc Lưu vào Tệp, gửi Zalo).':'Bấm “Mở PDF”, rồi dùng nút Chia sẻ của máy để In.';
-    share.onclick=async()=>{try{await navigator.share({files:[file],title:'Phiếu siêu âm tim tại giường'});closeBox()}catch(e){if(e.name!=='AbortError')toast('Không mở được bảng chia sẻ, dùng nút Mở PDF')}};
-    $('pdfBox').hidden=false;
-  }catch(e){toast('Không tạo được PDF, thử lại');try{window.print()}catch(_){}}
-  finally{b.disabled=false;b.textContent='In phiếu'}
+    const blob=await makePdf();if(job!==pdfJob)return;
+    pdfFile=new File([blob],pdfName(),{type:'application/pdf'});
+    save.disabled=false;save.textContent='Lưu PDF';
+    save.onclick=async()=>{
+      if(navigator.canShare&&navigator.canShare({files:[pdfFile]})){
+        try{await navigator.share({files:[pdfFile]})}catch(e){if(e.name!=='AbortError')toast('Không mở được bảng chia sẻ')}
+      }else{
+        const u=URL.createObjectURL(pdfFile);const a=document.createElement('a');a.href=u;a.download=pdfFile.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000);
+      }
+    };
+  }catch(e){save.disabled=false;save.textContent='In';save.onclick=()=>{try{window.print()}catch(_){}};toast('Không tạo được PDF')}
 };
 window.addEventListener('beforeprint',buildPrint);
 document.addEventListener('input',e=>{if(NO_AUTO.includes(e.target.id)){calc();keep()}else autoConc()});

@@ -1,0 +1,468 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Siêu âm tim tại giường</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SA tại giường">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: mobile-first (iPhone ~440px) — các khối đo xếp dọc, mỗi khối là lưới ô lớn; thanh thao tác cố định ở đáy; bản in A4 riêng */
+:root{
+  --bg:#f2f3f6; --paper:#ffffff; --ink:#1b2230; --muted:#5f6878; --line:#d6dae2; --soft:#eef0f4;
+  --accent:#a3253a; --calc:#e8f0f8; --calc-ink:#1f4f7a;
+  --warn:#b4570a; --bad:#b3261e; --ok:#2f7a4a;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111419; --paper:#1a1e26; --ink:#e7eaf0; --muted:#9ba4b3; --line:#2f3542; --soft:#232834;
+  --accent:#e0697d; --calc:#172739; --calc-ink:#9ec8f0;
+  --warn:#f0a35a; --bad:#f2827a; --ok:#7cc79a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111419; --paper:#1a1e26; --ink:#e7eaf0; --muted:#9ba4b3; --line:#2f3542; --soft:#232834;
+  --accent:#e0697d; --calc:#172739; --calc-ink:#9ec8f0;
+  --warn:#f0a35a; --bad:#f2827a; --ok:#7cc79a; color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
+  padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));
+  padding-block:0 calc(24px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+h1{font-size:21px;margin:2px 4px 2px;font-weight:700;letter-spacing:-.01em}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.card h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;margin:0;color:var(--accent);font-weight:700}
+.sub{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin:4px 0 -4px}
+.g2{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+.g3{display:grid;gap:8px;grid-template-columns:repeat(3,1fr)}
+.g4{display:grid;gap:8px;grid-template-columns:repeat(4,1fr)}
+.span2{grid-column:span 2}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted);font-weight:500;min-width:0}
+input,select,textarea{font:inherit;font-size:17px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 11px;width:100%;min-width:0;-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+textarea{resize:vertical;min-height:150px;line-height:1.5}
+input[type=number]{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* Ô đo */
+.m{display:flex;flex-direction:column;align-items:stretch;gap:4px;border:1px solid var(--line);border-radius:12px;padding:8px 8px 9px;background:var(--paper);min-width:0;position:relative}
+.m .n{font-size:14px;font-weight:700;text-align:center;line-height:1.2;padding:0 10px;white-space:nowrap}
+.m .r{font-family:var(--f-num);font-size:11.5px;color:var(--muted);text-align:center;white-space:nowrap}
+.m input{text-align:center;font-weight:600;font-size:20px;padding:8px 4px;border-radius:8px}
+.m .v{font-family:var(--f-num);font-weight:600;font-size:20px;text-align:center;padding:8px 0;color:var(--calc-ink)}
+.m.calc{background:var(--calc);border-color:transparent}
+.m.hi{border-color:var(--bad);box-shadow:inset 0 0 0 1px var(--bad)}
+.m.lo{border-color:var(--warn);box-shadow:inset 0 0 0 1px var(--warn)}
+.m.hi::after,.m.lo::after{position:absolute;top:5px;right:7px;font-size:12px;font-weight:700}
+.m.hi::after{content:"↑";color:var(--bad)} .m.lo::after{content:"↓";color:var(--warn)}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.chk{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.35;cursor:pointer;background:var(--paper)}
+.chk label:last-child{border-bottom:0}
+.chk input{width:20px;height:20px;flex:none;margin:0;padding:0;accent-color:var(--accent);-webkit-appearance:auto;appearance:auto}
+.chk label:has(input:checked){background:var(--calc)}
+.grp{text-align:center;font-size:13px;font-weight:700;padding-bottom:4px;border-bottom:2px solid var(--line)}
+.wall{grid-template-columns:repeat(4,1fr)!important}
+
+/* Chọn mức độ */
+.row{display:flex;flex-direction:column;gap:6px}
+.row>span{font-size:15px;color:var(--ink);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none;width:1px}
+.seg label{padding:10px 0;text-align:center;font-size:15px;cursor:pointer;border-right:1px solid var(--line);color:var(--ink);background:var(--paper)}
+.seg label:last-of-type{border-right:0}
+.seg input:checked+label{background:var(--accent);color:#fff;font-weight:600}
+.seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
+
+.out{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;background:var(--calc);color:var(--calc-ink);border-radius:12px;padding:12px}
+.out .lab{width:100%;font-size:13px;font-weight:500}
+.out .big{font-family:var(--f-num);font-size:28px;font-weight:600}
+.out .tag{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--paper);color:var(--ink)}
+.out .tag.bad{color:var(--bad)} .out .tag.warn{color:var(--warn)} .out .tag.ok{color:var(--ok)}
+
+button{font:inherit;font-size:16px;font-weight:600;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:12px 16px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.bar{padding:12px 0 4px;display:flex;flex-direction:column;gap:10px}
+.bar .in{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+@media (max-width:360px){.g4{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== Bản in ===== */
+#print{display:none;font-family:"Times New Roman",Times,serif;color:#000;background:#fff;font-size:12.5px;line-height:1.4}
+#print h3{text-align:center;font-size:17px;margin:4px 0 8px}
+#print .hd{display:flex;justify-content:space-between;font-size:12px}
+#print .pt{display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:3px 12px;margin:6px 0 8px;font-size:13px}
+#print table{border-collapse:collapse;width:100%;font-size:11.5px}
+#print td,#print th{border:1px solid #000;padding:3px 2px;text-align:center;color:#000}
+#print .res td{font-weight:700;font-size:13px}
+#print .cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-top:8px;font-size:13px}
+#print .cols p{margin:2px 0}
+#print .sec{font-weight:700;margin-top:6px!important}
+#print .kl{margin-top:10px;font-size:13.5px}
+#print .kl b{text-decoration:underline}
+#print .sign{display:flex;justify-content:flex-end;margin-top:14px;text-align:center;font-size:13px}
+/* Khi tạo PDF: dựng phiếu ngoài màn hình với khổ A4 trừ lề */
+body.rendering #print{display:block;position:fixed;left:-10000px;top:0;width:186mm;padding:0}
+/* Hộp PDF đã sẵn sàng */
+.pdfbox{position:fixed;inset:0;z-index:30;background:rgba(10,12,16,.55);display:flex;align-items:flex-end;justify-content:center;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.pdfbox .in{background:var(--paper);color:var(--ink);border-radius:16px;padding:18px;width:100%;max-width:480px;display:flex;flex-direction:column;gap:10px}
+.pdfbox b{font-size:17px}
+.pdfbox p{margin:0;font-size:14px;color:var(--muted)}
+.pdfbox a.btn{display:block;text-align:center;text-decoration:none;font-weight:600;border-radius:12px;padding:12px;background:var(--accent);color:#fff}
+@media print{
+  @page{size:A4;margin:12mm}
+  :root{color-scheme:light}
+  body{background:#fff;color:#000;padding:0;font-size:12.5px}
+  .wrap,.bar,.toast,.pdfbox{display:none!important}
+  #print{display:block;position:static;width:auto}
+}
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <h1>Siêu âm tim tại giường</h1>
+    <div class="in">
+      <button type="button" id="btnNew">Tạo mới</button>
+      <button type="button" class="primary" id="btnPrint">In phiếu</button>
+    </div>
+  </div>
+
+  <section class="card">
+    <h2>Hành chính</h2>
+    <div class="g2">
+      <label class="f span2">Họ tên<input id="pName" autocomplete="off" autocapitalize="words"></label>
+      <label class="f">Năm sinh / Tuổi<input id="pAge" inputmode="numeric"></label>
+      <label class="f">Giường<input id="pBed"></label>
+      <label class="f span2">Khoa<input id="pDept"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Siêu âm TM – 2D</h2>
+    <p class="sub">Buồng tim, ĐM chủ</p>
+    <div class="g3">
+      <div class="m" data-k="la"><span class="n">Nhĩ trái</span><span class="r">31±4 mm</span><input type="number" inputmode="decimal" step="any" id="la" aria-label="Nhĩ trái mm"></div>
+      <div class="m" data-k="rv"><span class="n">Thất phải</span><span class="r">16±4 mm</span><input type="number" inputmode="decimal" step="any" id="rv" aria-label="Thất phải mm"></div>
+      <div class="m" data-k="ao"><span class="n">ĐM chủ</span><span class="r">28±3 mm</span><input type="number" inputmode="decimal" step="any" id="ao" aria-label="Động mạch chủ mm"></div>
+    </div>
+
+    <p class="sub">Thất trái</p>
+    <div class="g2">
+      <div class="m" data-k="dd"><span class="n">Dd</span><span class="r">46±4 mm</span><input type="number" inputmode="decimal" step="any" id="dd" aria-label="Dd mm"></div>
+      <div class="m" data-k="ds"><span class="n">Ds</span><span class="r">30±3 mm</span><input type="number" inputmode="decimal" step="any" id="ds" aria-label="Ds mm"></div>
+    </div>
+    <div class="g4">
+      <div class="m calc" data-k="vd"><span class="n">Vd</span><span class="r">101±17 ml</span><span class="v" id="vd">–</span></div>
+      <div class="m calc" data-k="vs"><span class="n">Vs</span><span class="r">37±9 ml</span><span class="v" id="vs">–</span></div>
+      <div class="m calc" data-k="fs"><span class="n">%D</span><span class="r">34±6</span><span class="v" id="fs">–</span></div>
+      <div class="m calc" data-k="ef"><span class="n">EF</span><span class="r">63±7 %</span><span class="v" id="ef">–</span></div>
+    </div>
+    <p class="hint">Vd, Vs, %D, EF (Teich) tự tính theo Teichholz: V = 7·D³ / (2,4 + D), D tính bằng cm.</p>
+
+    <p class="sub">EF Simpson</p>
+    <div class="g2">
+      <div class="m" data-k="efs"><span class="n">EF Simpson</span><span class="r">≥ 50 %</span><input type="number" inputmode="decimal" step="any" id="efSimpson" aria-label="EF Simpson %"></div>
+    </div>
+
+    <p class="sub">Bề dày thành (mm)</p>
+    <div class="g4 wall">
+      <span class="grp span2">Vách liên thất</span><span class="grp span2">Thành sau TT</span>
+      <div class="m" data-k="ivsd"><span class="n">t.trg</span><span class="r">7,5±1</span><input type="number" inputmode="decimal" step="any" id="ivsd" aria-label="VLT tâm trương mm"></div>
+      <div class="m" data-k="ivss"><span class="n">t.thu</span><span class="r">10±2</span><input type="number" inputmode="decimal" step="any" id="ivss" aria-label="VLT tâm thu mm"></div>
+      <div class="m" data-k="pwd"><span class="n">t.trg</span><span class="r">7±1</span><input type="number" inputmode="decimal" step="any" id="pwd" aria-label="TSTT tâm trương mm"></div>
+      <div class="m" data-k="pws"><span class="n">t.thu</span><span class="r">12±1</span><input type="number" inputmode="decimal" step="any" id="pws" aria-label="TSTT tâm thu mm"></div>
+    </div>
+
+  </section>
+
+  <section class="card">
+    <h2>1 · Van hai lá</h2>
+    <label class="f">Tình trạng van, dây chằng<input id="mvState" value="thanh mảnh"></label>
+    <div class="row"><span>Hẹp van hai lá</span><div class="seg" data-name="mvS"></div></div>
+    <div class="g2">
+      <label class="f">S lỗ van 2D (cm²)<input type="number" inputmode="decimal" id="mva2d" step="any"></label>
+      <label class="f">S lỗ van PHT (cm²)<input type="number" inputmode="decimal" id="mvaPht" step="any"></label>
+    </div>
+    <div class="row"><span>Hở van hai lá</span><div class="seg" data-name="mvR"></div></div>
+    <p style="margin:0 0 -6px;font-size:13px;color:var(--muted);font-weight:500">S dòng hở (cm²)</p>
+    <div class="g3">
+      <label class="f">PLAX<input type="number" inputmode="decimal" id="mrPlax" step="any"></label>
+      <label class="f">A4C<input type="number" inputmode="decimal" id="mrA4c" step="any"></label>
+      <label class="f">A2C<input type="number" inputmode="decimal" id="mrA2c" step="any"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2 · Van động mạch chủ</h2>
+    <label class="f">Tình trạng van<input id="avState" value="thanh mảnh"></label>
+    <div class="row"><span>Hẹp van ĐMC</span><div class="seg" data-name="avS"></div></div>
+    <div class="g3">
+      <label class="f">Gradient tối đa (mmHg)<input type="number" inputmode="decimal" id="avGmax" step="any"></label>
+      <label class="f">Gradient TB (mmHg)<input type="number" inputmode="decimal" id="avGm" step="any"></label>
+      <label class="f">S lỗ van (cm²)<input type="number" inputmode="decimal" id="ava" step="any"></label>
+    </div>
+    <div class="row"><span>Hở van ĐMC</span><div class="seg" data-name="avR"></div></div>
+    <div class="g2">
+      <label class="f">VC (mm)<input type="number" inputmode="decimal" id="arVc" step="any"></label>
+      <label class="f">PHT (ms)<input type="number" inputmode="decimal" id="arPht" step="any"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3 · Van động mạch phổi</h2>
+    <label class="f">Tình trạng van<input id="pvState" value="thanh mảnh"></label>
+    <div class="row"><span>Hở van ĐMP</span><div class="seg" data-name="pvR"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>4 · Van ba lá – Áp lực ĐM phổi</h2>
+    <div class="row"><span>Hở van ba lá</span><div class="seg" data-name="tvR"></div></div>
+    <label class="f">Chênh áp tối đa qua hở van ba lá (mmHg)<input type="number" inputmode="decimal" id="trpg" step="any"></label>
+    <div class="row"><span>TM chủ dưới</span><div class="seg" style="grid-template-columns:repeat(3,1fr)">
+      <input type="radio" name="ivcS" id="ivc0" value="Xẹp"><label for="ivc0">Xẹp</label>
+      <input type="radio" name="ivcS" id="ivc1" value="Bình thường" checked><label for="ivc1">Bình thường</label>
+      <input type="radio" name="ivcS" id="ivc2" value="Giãn"><label for="ivc2">Giãn</label>
+    </div></div>
+    <div class="out" id="papsOut"><span class="lab">Áp lực ĐMP tâm thu ước tính</span><span class="big" id="paps">–</span></div>
+    <p class="hint">Áp lực nhĩ phải ước theo TM chủ dưới: xẹp → 5, bình thường → 10, giãn → 15 mmHg.</p>
+  </section>
+
+  <section class="card">
+    <h2>5 · Khác</h2>
+    <div id="other" class="stack">
+    <div class="row"><span>Dịch màng ngoài tim</span><div class="seg">
+      <input type="radio" name="periS" id="peri0" value="Không" checked><label for="peri0">Không</label>
+      <input type="radio" name="periS" id="peri1" value="Ít"><label for="peri1">Ít</label>
+      <input type="radio" name="periS" id="peri2" value="Vừa"><label for="peri2">Vừa</label>
+      <input type="radio" name="periS" id="peri3" value="Nhiều"><label for="peri3">Nhiều</label>
+    </div></div>
+    <div class="row"><span>Rối loạn vận động vùng</span><div class="chk" id="rwList"></div></div>
+    <div class="row"><span>Khác</span><div class="chk" id="exList"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Kết luận</h2>
+    <p class="hint">Tự viết theo số đo và lựa chọn ở trên. Sửa tay sau cùng, vì đổi số đo sẽ viết lại kết luận.</p>
+    <textarea id="conc"></textarea>
+    <label class="f">Bác sĩ siêu âm<input id="doctor"></label>
+  </section>
+</div>
+
+
+<div id="print"></div>
+<div class="pdfbox" id="pdfBox" hidden><div class="in">
+  <b>Phiếu PDF đã sẵn sàng</b>
+  <p id="pdfMsg"></p>
+  <button type="button" class="primary" id="pdfShare">In / Chia sẻ PDF</button>
+  <a class="btn" id="pdfOpen" href="#" target="_blank" rel="noopener">Mở PDF</a>
+  <button type="button" id="pdfClose">Đóng</button>
+</div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const GRADES=['Không','Nhẹ','Vừa','Nặng'];
+document.querySelectorAll('.seg[data-name]').forEach(seg=>{
+  const n=seg.dataset.name;
+  seg.innerHTML=GRADES.map((g,i)=>`<input type="radio" name="${n}" id="${n}${i}" value="${g}"${i?'':' checked'}><label for="${n}${i}">${g}</label>`).join('');
+});
+/* Mục Khác */
+const RW=[['rw0','Không thấy rối loạn vận động vùng thất trái'],
+ ['rw1','Giảm vận động 2/3 vách liên thất về mỏm và vùng mỏm, thành trước thất trái'],
+ ['rw2','Giảm vận động 2/3 thành sau dưới và 2/3 thành bên thất trái về đáy'],
+ ['rw3','Giảm vận động 1/3 vách liên thất, 1/3 thành dưới thất trái về đáy']];
+const EX=[['ex0','Không thấy lóc tách động mạch chủ'],['ex1','Không thấy huyết khối trong thân và nhánh lớn động mạch phổi']];
+const mk=(list,box)=>{$(box).innerHTML=list.map(([id,t])=>`<label for="${id}"><input type="checkbox" id="${id}"><span>${t}</span></label>`).join('')};
+mk(RW,'rwList');mk(EX,'exList');
+function radio(n,d){const r=document.querySelector(`input[name="${n}"]:checked`);return r?r.value:d}
+function buildNote(){
+  const L=[];const pv=radio('periS','Không');
+  L.push(pv==='Không'?'Không tràn dịch màng ngoài tim.':`Tràn dịch màng ngoài tim lượng ${pv.toLowerCase()}.`);
+  RW.concat(EX).forEach(([id,t])=>{if(document.getElementById(id).checked)L.push(t+'.')});
+  return L.map(s=>'- '+s).join('\n');
+}
+document.getElementById('other').addEventListener('change',e=>{
+  const id=e.target.id;
+  if(id==='rw0'&&e.target.checked)RW.slice(1).forEach(([i])=>document.getElementById(i).checked=false);
+  else if(/^rw[1-9]$/.test(id)&&e.target.checked)document.getElementById('rw0').checked=false;
+  autoConc();
+});
+const num=id=>{const v=parseFloat(String($(id).value).replace(',','.'));return isFinite(v)?v:null};
+const fmt=(v,d=0)=>v==null?'':v.toLocaleString('vi-VN',{maximumFractionDigits:d});
+const seg=n=>(document.querySelector(`input[name="${n}"]:checked`)||{}).value||'Không';
+const teich=mm=>{const d=mm/10;return 7*d*d*d/(2.4+d)};
+const NORM={la:[31,4],ao:[28,3],dd:[46,4],ds:[30,3],vd:[101,17],vs:[37,9],fs:[34,6],ef:[63,7],rv:[16,4],ivsd:[7.5,1],ivss:[10,2],pwd:[7,1],pws:[12,1],efs:[56,6]};
+function flag(k,v){
+  const el=document.querySelector(`.m[data-k="${k}"]`);if(!el)return;
+  el.classList.remove('hi','lo');if(v==null)return;const[m,s]=NORM[k];
+  if(v>m+s)el.classList.add('hi');else if(v<m-s)el.classList.add('lo');
+}
+let C={};
+function calc(){
+  const dd=num('dd'),ds=num('ds');
+  const vd=dd?teich(dd):null,vs=ds?teich(ds):null;
+  const fs=(dd&&ds)?(dd-ds)/dd*100:null, ef=(vd&&vs)?(vd-vs)/vd*100:null;
+  const ivcV=ivcState();const rap=ivcV==='Xẹp'?5:ivcV==='Giãn'?15:10;
+  const trpg=num('trpg');const paps=(trpg!=null&&rap!=null)?trpg+rap:null;
+  C={vd,vs,fs,ef,rap,paps,trpg};
+  $('vd').textContent=vd?fmt(vd):'–';$('vs').textContent=vs?fmt(vs):'–';
+  $('fs').textContent=fs!=null?fmt(fs):'–';$('ef').textContent=ef!=null?fmt(ef):'–';
+  flag('vd',vd);flag('vs',vs);flag('fs',fs);flag('ef',ef);
+  ['la','ao','dd','ds','rv','ivsd','ivss','pwd','pws'].forEach(k=>flag(k,num(k)));
+  const e=num('efSimpson');const efEl=document.querySelector('.m[data-k="efs"]');efEl.classList.remove('hi','lo');if(e!=null&&e<50)efEl.classList.add('lo');
+  const out=$('papsOut');out.querySelectorAll('.tag').forEach(t=>t.remove());
+  if(paps!=null){
+    $('paps').textContent=fmt(paps)+' mmHg';
+    const g=phGrade(paps);const t=document.createElement('span');t.className='tag '+g[1];t.textContent=g[0];out.appendChild(t);
+    const r=document.createElement('span');r.className='tag';r.textContent=`${fmt(trpg)} + ALNP ${fmt(rap)}`;out.appendChild(r);
+  }else $('paps').textContent=trpg!=null?'cần ALNP':'–';
+}
+function ivcState(){const r=document.querySelector('input[name="ivcS"]:checked');return r?r.value:'Bình thường'}
+function phGrade(p){return p<=35?['Bình thường','ok']:p<=45?['Tăng áp phổi nhẹ','warn']:p<=60?['Tăng áp phổi vừa','bad']:['Tăng áp phổi nặng','bad']}
+
+function autoConc(){
+  calc();const L=[];
+  const dd=num('dd'),la=num('la'),rv=num('rv'),ivsd=num('ivsd'),pwd=num('pwd');
+  const efS=num('efSimpson');const ef=efS!=null?efS:C.ef;const efLab=efS!=null?'EF Simpson':'EF';
+  if(dd!=null&&dd>50)L.push('Buồng thất trái giãn.');
+  if(rv!=null&&rv>20)L.push('Giãn thất phải.');
+  if((ivsd!=null&&ivsd>11)||(pwd!=null&&pwd>11))L.push('Dày thành thất trái.');
+  RW.forEach(([id,t])=>{if($(id).checked)L.push(t+'.')});
+  if(ef!=null){const e=Math.round(ef);
+    L.push(e>=50?`Chức năng tâm thu thất trái bảo tồn (${efLab} ${e}%).`:e>=41?`Chức năng tâm thu thất trái giảm nhẹ (${efLab} ${e}%).`:`Chức năng tâm thu thất trái giảm${e<30?' nặng':''} (${efLab} ${e}%).`);}
+  const v=(n,lab)=>{const g=seg(n);if(g!=='Không')L.push(`${lab} ${g.toLowerCase()}.`)};
+  v('mvS','Hẹp van hai lá');v('mvR','Hở van hai lá');v('avS','Hẹp van ĐMC');v('avR','Hở van ĐMC');v('tvR','Hở van ba lá');v('pvR','Hở van ĐMP');
+  if(C.paps!=null){const g=phGrade(C.paps);L.push(g[1]==='ok'?`Không tăng áp ĐMP (PAPs ${fmt(C.paps)} mmHg).`:`${g[0]} (PAPs ${fmt(C.paps)} mmHg).`)}
+  const pv=radio('periS','Không');L.push(pv!=='Không'?`Tràn dịch màng ngoài tim lượng ${pv.toLowerCase()}.`:'Không tràn dịch màng ngoài tim.');
+  EX.forEach(([id,t])=>{if($(id).checked)L.push(t+'.')});
+  $('conc').value=L.map(s=>'- '+s).join('\n');keep();
+}
+const NO_AUTO=['conc','doctor','pName','pAge','pBed','pDept'];
+
+/* Giữ phiếu đang nhập khi lỡ tải lại trang */
+const FIELDS=['pName','pAge','pBed','pDept','la','ao','dd','ds','rv','ivsd','ivss','pwd','pws','efSimpson','mvState','mva2d','mvaPht','mrPlax','mrA4c','mrA2c','avState','avGmax','avGm','ava','arVc','arPht','trpg','pvState','conc','doctor'];
+const SEGS=['mvS','mvR','avS','avR','tvR','pvR'];
+const KEY='satg_current';
+const IVC=['Xẹp','Bình thường','Giãn'];
+function collect(){const o={};FIELDS.forEach(f=>o[f]=$(f).value);SEGS.forEach(s=>o[s]=seg(s));o.ivcS=ivcState();o.periS=radio('periS','Không');o.chk=RW.concat(EX).filter(([id])=>$(id).checked).map(([id])=>id);return o}
+function setRadio(n,v){document.querySelectorAll(`input[name="${n}"]`).forEach((r,i)=>r.checked=v==null?i===0:r.value===v)}
+function fill(o){FIELDS.forEach(f=>{if(o[f]!==undefined)$(f).value=o[f]});SEGS.forEach(s=>{const i=GRADES.indexOf(o[s]);const el=$(s+(i<0?0:i));if(el)el.checked=true});const k=IVC.indexOf(o.ivcS);$('ivc'+(k<0?1:k)).checked=true;setRadio('periS',o.periS);RW.concat(EX).forEach(([id])=>$(id).checked=(o.chk||[]).includes(id));calc()}
+function keep(){try{localStorage.setItem(KEY,JSON.stringify(collect()))}catch(e){}}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1800)}
+
+$('btnNew').onclick=()=>{
+  const b=$('btnNew');
+  if(!b.dataset.c){b.dataset.c=1;b.textContent='Bấm lần nữa để xóa';setTimeout(()=>{delete b.dataset.c;b.textContent='Tạo mới'},3000);return}
+  delete b.dataset.c;b.textContent='Tạo mới';
+  const doc=$('doctor').value;
+  FIELDS.forEach(f=>{const el=$(f);el.value=el.tagName==='SELECT'?el.options[0].value:''});
+  ['mvState','avState','pvState'].forEach(f=>$(f).value='thanh mảnh');
+  SEGS.forEach(s=>$(s+'0').checked=true);$('ivc1').checked=true;
+  setRadio('periS');RW.concat(EX).forEach(([id])=>$(id).checked=false);
+  $('doctor').value=doc;autoConc();window.scrollTo({top:0});toast('Đã tạo phiếu mới');
+};
+
+/* Bản in */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function buildPrint(){
+  calc();const v=id=>esc($(id).value);const c=x=>x!=null?fmt(x):'';
+  const d=new Date();const date=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+  const sel=n=>seg(n).toLowerCase();
+  $('print').innerHTML=`
+  <div class="hd"><span></span><span>Ngày ${date}</span></div>
+  <h3>PHIẾU SIÊU ÂM TIM TẠI GIƯỜNG</h3>
+  <div class="pt"><span>Họ tên: <b>${v('pName')}</b></span><span>NS/Tuổi: ${v('pAge')}</span><span>Giường: ${v('pBed')}</span><span>Khoa: ${v('pDept')}</span></div>
+  <table>
+   <tr><th rowspan="2">Nhĩ trái</th><th rowspan="2">ĐM chủ</th><th colspan="6">Thất trái</th><th rowspan="2">Thất phải</th><th colspan="2">VLT</th><th colspan="2">TSTT</th></tr>
+   <tr><th>Dd</th><th>Ds</th><th>Vd</th><th>Vs</th><th>%D</th><th>EF (Teich)</th><th>t.trg</th><th>t.thu</th><th>t.trg</th><th>t.thu</th></tr>
+   <tr><td>31±4 mm</td><td>28±3 mm</td><td>46±4 mm</td><td>30±3 mm</td><td>101±17 ml</td><td>37±9 ml</td><td>34±6</td><td>63±7 %</td><td>16±4 mm</td><td>7,5±1</td><td>10±2</td><td>7±1</td><td>12±1</td></tr>
+   <tr class="res"><td>${v('la')}</td><td>${v('ao')}</td><td>${v('dd')}</td><td>${v('ds')}</td><td>${c(C.vd)}</td><td>${c(C.vs)}</td><td>${c(C.fs)}</td><td>${c(C.ef)}</td><td>${v('rv')}</td><td>${v('ivsd')}</td><td>${v('ivss')}</td><td>${v('pwd')}</td><td>${v('pws')}</td></tr>
+  </table>
+  <p style="margin:4px 0 0;font-size:13px"><b>EF Simpson:</b> ${$('efSimpson').value?v('efSimpson')+' %':'....'}</p>
+  <div class="cols">
+   <div>
+    <p class="sec">1 - Van hai lá:</p>
+    <p>T.trạng van, dây chằng: ${v('mvState')}</p>
+    <p>Hẹp van hai lá: ${sel('mvS')}</p>
+    <p>S lỗ van: ${v('mva2d')||'....'} cm² (2D); ${v('mvaPht')||'....'} cm² (PHT)</p>
+    <p>Hở van hai lá: ${sel('mvR')}</p>
+    <p>S dòng hở: PLAX ${v('mrPlax')||'....'} — A4C ${v('mrA4c')||'....'} — A2C ${v('mrA2c')||'....'} cm²</p>
+    <p class="sec">2 - Van động mạch chủ:</p>
+    <p>Tình trạng van: ${v('avState')}</p>
+    <p>Hẹp van ĐMC: ${sel('avS')}</p>
+    <p>Gradient tối đa: ${v('avGmax')||'....'} mmHg; trung bình: ${v('avGm')||'....'} mmHg; S lỗ van: ${v('ava')||'....'} cm²</p>
+    <p>Hở van ĐMC: ${sel('avR')}</p>
+    <p>VC: ${v('arVc')||'....'} mm; PHT: ${v('arPht')||'....'} ms</p>
+   </div>
+   <div>
+    <p class="sec">3 - Van động mạch phổi:</p>
+    <p>Tình trạng van: ${v('pvState')} — Hở van ĐMP: ${sel('pvR')}</p>
+    <p class="sec">4 - Van ba lá:</p>
+    <p>Hở van ba lá: ${sel('tvR')}</p>
+    <p>Chênh áp tối đa qua hở van ba lá: ${C.trpg!=null?fmt(C.trpg):'....'} mmHg</p>
+    <p>TM chủ dưới: ${ivcState().toLowerCase()} — ALNP ước tính: ${fmt(C.rap)} mmHg</p>
+    <p><b>Áp lực ĐMP tâm thu ước tính: ${C.paps!=null?fmt(C.paps):'....'} mmHg</b></p>
+   </div>
+  </div>
+  <div class="kl"><b>KẾT LUẬN:</b><br>${v('conc').replace(/\n/g,'<br>')}</div>
+  <div class="sign"><div>Ngày ${date}<br><b>Bác sĩ siêu âm</b><br><br><br><br>${v('doctor')}</div></div>`;
+}
+/* In: trên điện thoại tạo PDF rồi mở bảng chia sẻ (có In, Lưu vào Tệp, Zalo…); trên máy tính dùng hộp in của trình duyệt */
+const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
+function pdfName(){const n=($('pName').value||'phieu').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').replace(/[^\w]+/g,'_').replace(/^_|_$/g,'');return `SA_tai_giuong_${n||'phieu'}.pdf`}
+async function makePdf(){
+  buildPrint();document.body.classList.add('rendering');
+  try{
+    return await html2pdf().set({margin:12,image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,backgroundColor:'#ffffff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from($('print')).outputPdf('blob');
+  }finally{document.body.classList.remove('rendering')}
+}
+let pdfUrl=null;
+function closeBox(){$('pdfBox').hidden=true}
+$('pdfClose').onclick=closeBox;
+$('btnPrint').onclick=async()=>{
+  if(!isMobile||typeof html2pdf==='undefined'){buildPrint();try{window.print()}catch(e){}return}
+  const b=$('btnPrint');b.disabled=true;b.textContent='Đang tạo PDF…';
+  try{
+    const blob=await makePdf();const name=pdfName();
+    const file=new File([blob],name,{type:'application/pdf'});
+    if(pdfUrl)URL.revokeObjectURL(pdfUrl);pdfUrl=URL.createObjectURL(blob);
+    const share=$('pdfShare'),open=$('pdfOpen');
+    open.href=pdfUrl;open.download=name;
+    const canShare=!!(navigator.canShare&&navigator.canShare({files:[file]}));
+    share.hidden=!canShare;
+    $('pdfMsg').textContent=canShare?'Bấm “In / Chia sẻ PDF”, rồi chọn In (hoặc Lưu vào Tệp, gửi Zalo).':'Bấm “Mở PDF”, rồi dùng nút Chia sẻ của máy để In.';
+    share.onclick=async()=>{try{await navigator.share({files:[file],title:'Phiếu siêu âm tim tại giường'});closeBox()}catch(e){if(e.name!=='AbortError')toast('Không mở được bảng chia sẻ, dùng nút Mở PDF')}};
+    $('pdfBox').hidden=false;
+  }catch(e){toast('Không tạo được PDF, thử lại');try{window.print()}catch(_){}}
+  finally{b.disabled=false;b.textContent='In phiếu'}
+};
+window.addEventListener('beforeprint',buildPrint);
+document.addEventListener('input',e=>{if(NO_AUTO.includes(e.target.id)){calc();keep()}else autoConc()});
+/* Tự đổi tình trạng van khi chọn hẹp/hở từ nhẹ trở lên */
+const VALVES=[['mvState',['mvS','mvR']],['avState',['avS','avR']]];
+function autoState(e){
+  const n=e.target&&e.target.name;if(!n)return;
+  VALVES.forEach(([st,segs])=>{
+    if(!segs.includes(n))return;
+    const el=$(st),cur=el.value.trim().toLowerCase();
+    const lesion=segs.some(s=>seg(s)!=='Không');
+    if(lesion&&(cur===''||cur==='thanh mảnh'))el.value='dày nhẹ';
+    else if(!lesion&&cur==='dày nhẹ')el.value='thanh mảnh';
+  });
+}
+document.addEventListener('change',e=>{autoState(e);if(NO_AUTO.includes(e.target.id)){calc();keep()}else autoConc()});
+
+let saved=null;try{saved=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
+if(saved)fill(saved);
+else{fill({pName:'(Ví dụ) Nguyễn Văn A',pAge:'1958',pBed:'12',la:'32',ao:'31',dd:'60',ds:'52',rv:'22',ivsd:'8',pwd:'8',
+  mvR:'Vừa',tvR:'Nhẹ',trpg:'40',ivcS:'Giãn',pvR:'Nhẹ'});autoConc()}
+calc();
+})();
+</script>
